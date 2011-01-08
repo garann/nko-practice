@@ -1,8 +1,7 @@
-var http = require('http');
+var express = require('express');
  
-var server = http.createServer(function (req, res) {
-  res.writeHead(200, { "Content-Type": "text/plain" })
-  res.end("I need like 17 clones.\n");
+express.get('/', function(req, res) {
+	res.send("I need like 17 clones.");
 });
  
-server.listen(80);
+express.listen(80);
