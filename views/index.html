@@ -11,45 +11,39 @@
 
 	<div class="container">
 
+		<input id="username" type="text" placeholder="enter a nickname" />
 		<div class="users">Your name here :D</div>
 		<div class="chat">No one has said anything yet!</div>
-		<input id="talk" type="text" />
+		<input id="talk" type="text" placeholder="type to chat" />
 		<input id="talkbtn" type="button" value="talk"/>
 
 	</div>
 
 
-	<script type="text/html" id="timeBlock-tmpl">
-		<div class="timeBlock" data-date="${date}" data-hour="${hour}" data-min="${minute}">
-			<h2>
-				<span class="date">${date}</span>
-				<span class="day">${day}</span>
-				<span class="hour">${hour}</span>
-				<span class="minute">${minute}</span>
-			</h2>		
-		</div>
-	</script>
-	
-	<script type="text/html" id="event-tmpl">
-		<div class="event row${rowIndex} {{each tags}}${$value}{{/each}}" data-id="${id}" style="left:${clonez.cssLeft(start)}px;width:${clonez.cssWidth(start,end)}px;">
-			${name}
-		</div>
-	</script>
 	
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
 	<script src="/socket.io/socket.io.js"></script>
 	<script>
+	var username = "";
 	$(function() {
 		var socket = io.connect();
 		socket.on("message", function(m) {
-			$("div.chat").append("<span>" + m + "</span>");
+			$("div.chat").append("<span><b>" + m.user + "</b> " + m.text + "</span>");
+		});
+		socket.on("userlist", function(l) {
+			$("div.users").html("<b>" + l.join("</b><b>") + "</b>");
 		});
 		$("#talkbtn").click(function(e) {
 			e.preventDefault();
 			var inp = $("#talk"),
-				text = inp.val();
-			socket.send(text);
+				text = inp.val(),
+				user = $("#username").val() || "<new user>";
+			socket.emit("chatmsg", {text: text, user: user});
 			inp.val("");
+		});
+		$("#username").change(function(e) {
+			socket.emit("changenick", {prev: username, new: this.val()});
+			username = this.val();
 		});
 	});
 	</script>
