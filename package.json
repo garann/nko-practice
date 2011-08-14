@@ -2,7 +2,7 @@
   "name":"nko-practice",
   "version":"0.0.1",
   "dependencies":{
-    "express":"2.2.4",
+    "express":"2.4.4",
     "socket.io":"0.7.9",
     "redis-client":"0.3.5"
   }
