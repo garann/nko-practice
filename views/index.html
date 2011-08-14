@@ -1,0 +1,139 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>17 clones</title>
+</head>
+
+<body>
+
+	<div class="zoomLevel">
+		<a>month</a>
+		<a>week</a>
+		<a>day</a>
+		<a>hours</a>
+		<a>30 minutes</a>
+		<a class="selected">15 minutes</a>
+	</div>
+	
+	<div class="cal">
+	
+	
+	
+	</div>
+
+
+	<script type="text/html" id="timeBlock-tmpl">
+		<div class="timeBlock" data-date="${date}" data-hour="${hour}" data-min="${minute}">
+			<h2>
+				<span class="date">${date}</span>
+				<span class="day">${day}</span>
+				<span class="hour">${hour}</span>
+				<span class="minute">${minute}</span>
+			</h2>		
+		</div>
+	</script>
+	
+	<script type="text/html" id="event-tmpl">
+		<div class="event row${rowIndex} {{each tags}}${$value}{{/each}}" data-id="${id}" style="left:${clonez.cssLeft(start)}px;width:${clonez.cssWidth(start,end)}px;">
+			${name}
+		</div>
+	</script>
+	
+	<script>
+		if (!clonez) var clonez = {};
+		clonez.timeUnits = [];
+		clonez.timeUnits["fifteenMinutes"] = 1000*60*15;
+		clonez.timeUnits["halfHour"] = 1000*60*30;
+		clonez.timeUnits["hour"] = 1000*60*60;
+		clonez.timeUnits["threeHours"] = 1000*60*60*3;
+		clonez.timeUnits["day"] = 1000*60*60*24;
+		clonez.timeUnits["week"] = 1000*60*60*24*7;
+		
+		$.template("eventTmpl","#event-tmpl");
+		
+		(function($){
+			clonez.startAt = "11/29/2010 1:00";
+			clonez.endAt = "11/29/2010 24:59";
+			// unit of time == 10px
+			clonez.timeUnit = clonez.timeUnits["hour"];
+			clonez.rows = [];
+			var events = [
+							{name: "Event Four", start: "11/28/2010 22:00", end: "11/29/2010 2:00"},
+							{name: "Event Three", start: "11/29/2010 19:00", end: "11/29/2010 21:00"},
+							{name: "Event Two", start: "11/29/2010 20:00", end: "11/29/2010 22:00"},
+							{name: "Event One", start: "11/29/2010 22:00", end: "11/30/2010 2:00"}
+						];
+			
+			function init() {
+				// loading a timeblock on a clean page	
+				while(events.length) {
+					var e = events.shift();				
+					if (rows.length) {
+						var lastRow = rows[rows.length-1],
+							lastEvent = lastRow[lastRow.length-1];
+						if (Date.parse(lastEvent.end) <= Date.parse(e.start)) {
+							e.rowIndex = rows.length-1;
+							lastRow.push(e);	
+						} else {
+							e.rowIndex = rows.length;
+							rows.push([e]);
+						}
+					} else {
+						e.rowIndex = rows.length;
+						rows.push([e]);
+					}
+				}
+			}
+			
+			function showNewEvents() {
+				// load new events
+				while(events.length) {
+					var e = events.shift(),
+						foundASpot = false;
+					for (var i=0,l=rows.length; i<l; i++) {
+						var firstEvent = rows[i][0],
+							lastEvent = rows[i][rows[i].length-1];
+						if (Date.parse(e.end) <= Date.parse(firstEvent.start)) {
+							e.rowIndex = i;
+							rows[i].unshift(e);
+							foundASpot = true;
+							break;
+						} else if (Date.parse(lastEvent.end) <= Date.parse(e.start)) {
+							e.rowIndex = i;
+							rows[i].push(e);
+							foundASpot = true;
+							break;
+						}
+					}
+					if (!foundASpot) {
+						e.rowIndex = rows.length;
+						rows.push([e]);
+					}
+				}
+			}
+			
+			function drawRows() {
+				$.each(clonez.rows,function(i) {
+					$("div.cal").append($.tmpl("eventTmpl",this));
+				});
+			}
+		})(jQuery);
+		
+		clonez.cssLeft = function (start) {
+			var eStart = Date.parse(start),
+				calStart = Date.parse(clonez.startAt),
+				diff = eStart - calStart;
+			return parseInt( diff / clonez.timeUnit ) * 10;
+		};
+		
+		clonez.cssWidth = function (start,end) {
+			var eStart = Date.parse(start),
+				eEnd = Date.parse(end),
+				diff = eEnd - eStart;
+			return parseInt( diff / clonez.timeUnit ) * 10;
+		};
+	</script>
+
+</body>
+</html>
