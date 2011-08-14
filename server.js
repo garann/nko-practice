@@ -1,11 +1,27 @@
-var express = require('express').createServer(),
+const express = require('express'),
+        app = express.createServer(),
 	redis = require('redis-client'),
 	db = redis.createClient(),
 	io = require('socket.io'),
-	sock = io.listen(express);
+	sock = io.listen(app);
+
+
+app.configure(function(){
+    app.set('views', __dirname + '/views');
+    app.set("view options", {layout: false});
+    app.use(express.static(__dirname + '/public'));
+});
+
+app.register('.html', {
+    compile: function(str, options){
+	return function(locals){
+            return str;
+	};
+    }
+});
  
-express.get('/', function(req, res) {
-	res.render("index");
+app.get('/', function(req, res) {
+	res.render("index.html");
 });
 
 sock.on("connection",function(c) {
@@ -14,4 +30,4 @@ sock.on("connection",function(c) {
 	});
 });
  
-express.listen(8000);
+app.listen(8000);
