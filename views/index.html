@@ -10,7 +10,7 @@
 	
 
 	<div class="container">
-
+	  <a id="login" href="#">Login</a>
 		<div class="users">Your name here :D</div>
 		<div class="chat">No one has said anything yet!</div>
 		<input id="talk" type="text" />
@@ -39,18 +39,49 @@
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
 	<script src="/socket.io/socket.io.js"></script>
 	<script>
+	  var username = "";
 	$(function() {
 		var socket = io.connect();
-		socket.on("message", function(m) {
-			$("div.chat").append("<span>" + m + "</span>");
+		socket.on("chatMsg", function(m) {
+			$("div.chat").append("<div><b>" + m.nick + ":</b> " + m.msg + "</div>");
 		});
+
+	        socket.on("authPassed", function(m) {
+	            username = m.username;
+	            $(".users").html(username);
+	        });
+
 		$("#talkbtn").click(function(e) {
 			e.preventDefault();
 			var inp = $("#talk"),
-				text = inp.val();
-			socket.send(text);
+	                text = inp.val();
+			socket.emit("chatMsg", {'chatMsg': text});
+                        $("div.chat").append("<div class='myMsg'><b>" + username + ":</b> " + text + "</div>");
 			inp.val("");
 		});
+
+	        $("#login").click(function(e) {
+	            navigator.id.getVerifiedEmail(function(assertion) {
+                        if (assertion) {
+	                    var nick = prompt("Pick a nickname:");
+	                    if (nick)
+	                        socket.emit("browserid", {'username': nick, 'assertion': assertion});
+	                } else {
+	                    //some failed msg here...
+	                }
+        	    });
+                });
+
+	        socket.on('connect', function(){});
+	        socket.on('disconnect', function(){});
+	        socket.on('reconnect', function(){});
+	        socket.on('reconnecting', function( nextRetry ){ 
+	            //console.log('Attempting to re-connect to the server, next attempt in ' + nextRetry + 'ms'); 
+	        });
+	        socket.on('reconnect_failed', function(){ 
+	            //console.log('Reconnected to server FAILED.'); 
+	        });
+
 	});
 	</script>
 
