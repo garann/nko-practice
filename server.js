@@ -1,6 +1,6 @@
 const express = require('express'),
         config = require('./config.js').config,
-        app = express.createServer(),
+	app = express.createServer(),
         redisStore = require('connect-redis')(express);
 	redis = require('redis-client'),
 	db = redis.createClient(),
@@ -30,9 +30,9 @@ app.configure(function(){
 
 app.register('.html', {
     compile: function(str, options) {
-	return function(locals){
-            return str;
-	};
+		return function(locals){
+	            return str;
+		};
     }
 });
 
