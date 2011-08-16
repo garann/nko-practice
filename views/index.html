@@ -7,11 +7,8 @@
 
 <body>
 
-	
-
 	<div class="container">
 	  <a id="login" href="#">Login</a>
-		<input id="username" type="text" placeholder="enter a nickname" />
 		<div class="users">Your name here :D</div>
 		<div class="chat">No one has said anything yet!</div>
 		<input id="talk" type="text" placeholder="type to chat" />
@@ -47,6 +44,7 @@
                         $("div.chat").append("<div class='myMsg'><b>" + username + ":</b> " + text + "</div>");
 			inp.val("");
 		});
+
 		$("#username").change(function(e) {
 			socket.emit("changenick", {prev: username, new: this.val()});
 			username = this.val();

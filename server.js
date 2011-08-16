@@ -54,7 +54,7 @@ io.sockets.on('connection', function(client) {
     client.on('browserid', function(data) {
 	rest.post("https://browserid.org/verify", 
 		  { data: {assertion: data.assertion, audience: host} }).on('complete', function(bData, response) {
-		      if (bData.status == "okay") {
+		      if (bData.status == "okay" && bData.audience == host) {
 			  users[client.id] = data.username;
 			  client.emit('authPassed', {username: data.username});
 		      } else {
