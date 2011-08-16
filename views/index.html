@@ -11,8 +11,10 @@
 	  <a id="login" href="#">Login</a>
 		<div class="users">Your name here :D</div>
 		<div class="chat">No one has said anything yet!</div>
-		<input id="talk" type="text" placeholder="type to chat" />
-		<input id="talkbtn" type="button" value="talk"/>
+		<form id="talkForm">
+		  <input id="talk" type="text" placeholder="type to chat" />
+		  <input id="talkbtn" type="Submit" value="talk"/>
+		</form>
 
 	</div>
 
@@ -27,6 +29,7 @@
 		socket.on("chatMsg", function(m) {
 			$("div.chat").append("<div><b>" + m.nick + ":</b> " + m.msg + "</div>");
 		});
+
 		socket.on("userlist", function(l) {
 			$("div.users").html("<b>" + l.join("</b><b>") + "</b>");
 		});
@@ -36,13 +39,13 @@
 	            $(".users").html(username);
 	        });
 
-		$("#talkbtn").click(function(e) {
-			e.preventDefault();
+		$("#talkForm").submit(function() {
 			var inp = $("#talk"),
 	                text = inp.val();
 			socket.emit("chatMsg", {'chatMsg': text});
                         $("div.chat").append("<div class='myMsg'><b>" + username + ":</b> " + text + "</div>");
 			inp.val("");
+	                return false;
 		});
 
 		$("#username").change(function(e) {
