@@ -57,7 +57,7 @@ io.sockets.on('connection', function(client) {
     /* Handle session reconnect, page reloads, etc. */
     client.sId = getSID(client);
     if (users[client.sId]) {
-	client.emit('authPassed', {username: users[client.sId].username});
+	client.emit('authPassed', {username: (users[client.sId] ? users[client.sId].username : "new user")});
     } else {
 	console.log("No user for session: "+client.sId);
     }
@@ -76,7 +76,7 @@ io.sockets.on('connection', function(client) {
 
     client.on('chatMsg', function(data) {
 	if (users[client.sId] != "") {
-	    client.broadcast.emit('chatMsg', {nick: users[client.sId].username, msg: data.chatMsg});
+	    client.broadcast.emit('chatMsg', {nick: (users[client.sId] ? users[client.sId].username : "new user"), msg: data.chatMsg});
 	} else {
 	    console.log("user not logged in");
 	}
